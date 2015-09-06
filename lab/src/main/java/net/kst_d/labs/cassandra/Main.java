@@ -32,7 +32,6 @@ import rx.Observable;
 public class Main {
 
     public static final Pattern ROW_SPLITTER = Pattern.compile("\t");
-    public static final Pattern DATE_SPLITTER = Pattern.compile(" ");
 
     public static final List<Two<String, Function<String, Object>>> ROWS = Arrays.asList(
 		    Two.of(Constants.ID, s -> s),
@@ -81,13 +80,9 @@ public class Main {
 			.addContactPoint("192.168.56.31")
 			.addContactPoint("192.168.56.32")
 			.addContactPoint("192.168.56.33")
-//			.addContactPoint("127.0.0.1")
 			.build();
 	     final Session session = cluster.connect("lab0")
 	) {
-	    final Session.State state = session.getState();
-
-//	    final String file = "one.txt";
 	    final String file = "some-data.tsv";
 	    final Observable<Two<Long, String>> fileObservable = fileLines(file, Charset.forName("windows-1251"));
 
@@ -96,9 +91,8 @@ public class Main {
 
 	    final Observable<CompletableFuture<ResultSet>> futures = parsed.map(f -> f.thenApply(row -> cassandraWriter(row._1, row._2, session)));
 
-	    CompletableFuture<List<ResultSet>> initial = CompletableFuture.completedFuture(new ArrayList<>());
-
-	    final Observable<CompletableFuture<List<ResultSet>>> total = futures.reduce(initial, (before, future) -> before.thenCombine(future, (l, r) -> {
+	    final Observable<CompletableFuture<List<ResultSet>>> total = futures.reduce(
+			    CompletableFuture.completedFuture(new ArrayList<>()), (before, future) -> before.thenCombine(future, (l, r) -> {
 		l.add(r);
 		return l;
 	    }));
@@ -152,16 +146,6 @@ public class Main {
 	    e.printStackTrace();
 	}
 	return null;
-    }
-
-    static String prepareDate(String in) {
-	if (StringUtils.isBlank(in)) {
-	    return in;
-	}
-	final String[] split = DATE_SPLITTER.split(in);
-	final String date = split[0].replaceAll("(\\d{2}).(\\d{2}).(\\d{4})", "$3-$2-$1");
-
-	return date + " " + split[1];
     }
 
     static Integer prepareInt(String in) {
