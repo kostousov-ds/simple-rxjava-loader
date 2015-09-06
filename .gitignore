@@ -1,12 +1,28 @@
-*.class
+#common
+target/
+out/
+classes/
+syntax:glob
+*.swp
+git.properties
+jboss-as-7.1.1.Final
 
-# Mobile Tools for Java (J2ME)
-.mtj.tmp/
+#IDEA Project Files
+*iml
+*iws
+.idea
+*ipr
+ishopdb
+*.log
 
-# Package Files #
-*.jar
-*.war
-*.ear
+# Eclipse Project Files
+.settings/
+.gwt/
+.project
+.classpath
+/wildfly-*
+/wildfly
+/configuration
+/deployments
+/log
 
-# virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
-hs_err_pid*
